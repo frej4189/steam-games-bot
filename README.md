@@ -3,6 +3,9 @@
 As it has come to my attention that a scammer had been reselling my bot, and had added backdoors to it, I am now releasing it for free.
 
 
+To use the bot, first run install.bat, then fill in the values in config.json, and then run start.bat
+
+
 Loading games into the bot can be done as it is described in the data/load/example.txt file, in this case, loading it into the bot would be done with !load example.txt
 
 

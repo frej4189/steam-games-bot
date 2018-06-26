@@ -1,0 +1,20 @@
+{
+  "name": "steam-games-selling-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Frej Alexander Nielsen <frejnielsen59@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "@doctormckay/steam-webapi": "^1.1.1",
+    "request": "^2.85.0",
+    "steam-totp": "^2.1.0",
+    "steam-tradeoffer-manager": "^2.9.3",
+    "steam-user": "^3.27.1",
+    "steamcommunity": "^3.36.1",
+    "steamid": "^1.1.0"
+  }
+}

@@ -1,0 +1,34 @@
+{
+    "admins": ["STEAMID"],
+    "username": "",
+    "password": "",
+    "shared": "",
+	"identity": "",
+	"group": "bit after /group/",
+	"apikey": "YOUR API KEY HERE",
+	"csgo": [
+		"Clutch Case Key",
+		"Spectrum 2 Case Key",
+		"Operation Hydra Case Key",
+		"Spectrum Case Key",
+		"Glove Case Key",
+		"Gamma 2 Case Key",
+		"Gamma Case Key",
+		"Chroma 3 Case Key",
+		"Operation Wildfire Case Key",
+		"Revolver Case Key",
+		"Winter Offensive Case Key",
+		"Shadow Case Key",
+		"Operation Vanguard Case Key",
+		"Operation Phoenix Case Key",
+		"Operation Breakout Case Key",
+		"Huntsman Case Key",
+		"Falchion Case Key",
+		"CS:GO Case Key",
+		"Chroma Case Key",
+		"Chroma 2 Case Key"
+	],
+	"tf": [
+		"Mann Co. Supply Crate Key"
+	]
+}

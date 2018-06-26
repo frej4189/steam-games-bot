@@ -2,6 +2,8 @@
 
 As it has come to my attention that a scammer had been reselling my bot, and had added backdoors to it, I am now releasing it for free.
 
+It accepts TF2 Keys, CS:GO keys and gems.
+
 
 To use the bot, first run install.bat, then fill in the values in config.json, and then run start.bat
 

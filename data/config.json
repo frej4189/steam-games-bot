@@ -1,8 +1,8 @@
 {
-    "admins": ["STEAMID"],
-    "username": "",
-    "password": "",
-    "shared": "",
+    	"admins": ["STEAMID"],
+    	"username": "",
+    	"password": "",
+    	"shared": "",
 	"identity": "",
 	"group": "bit after /group/",
 	"apikey": "YOUR API KEY HERE",

@@ -23,3 +23,6 @@ Messages can be changed in the files commands.js and steam.js, anywhere that say
 This bot is published under the MIT License, additional information can be found in LICENSE
 
 If you want support for this bot, you'll have to pay for it, I can be contacted at my steam profile: https://steamcommunity.com/id/jegerkatten
+
+
+API Key can be retrieved at https://steamcommunity.com/dev/apikey

@@ -13,6 +13,8 @@ const steam = require('./steam');
 const users = require('./users');
 const files = require('./files');
 
+var first = true;
+
 exports.setup = (client, cookies, callback) => {
 	manager = new TradeOfferManager({
 		steam: client,
@@ -23,8 +25,15 @@ exports.setup = (client, cookies, callback) => {
 	manager.setCookies(cookies);
 	community.setCookies(cookies);
 	api = new WebAPI(files.getConfig().apikey);
-	callback()
+	if(first) {
+		callback();
+		first = false;
+	}
 	registerEvents();
+
+	community.on('sessionExpired', () => {
+		steam.web();
+	});
 }
 
 exports.inviteUserToGroup = (user) => {

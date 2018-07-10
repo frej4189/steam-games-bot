@@ -27,6 +27,10 @@ exports.updatePersona = (total, csgo, tf, gems) => {
 	client.gamesPlayed(total + " games | " + csgo + " CSGO | " + tf + " TF | " + gems + " GEMS");
 }
 
+exports.web = () => {
+	client.webLogOn();
+}
+
 exports.setup = callback => {
 	config = files.getConfig();
 

@@ -93,18 +93,12 @@ exports.hasOffer = (user, callback) => {
 				}
 			});
 
+			console.log(found ? "I have an outstanding offer with " + user.toString() : "I don't have an outstanding offer with " + user.toString());
+
 			return callback(null, found);
 		}
 
 		callback(null, false);
-	});
-}
-
-exports.checkForAccepted = (user, callback) => {
-	user = user.toString();
-
-	manager.getOffers(TradeOfferManager.EOfferFilter.HistoricalOnly, (error, sent, received) => {
-
 	});
 }
 

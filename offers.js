@@ -96,7 +96,8 @@ exports.hasOffer = (user, callback) => {
 			console.log(found ? "I have an outstanding offer with " + user.toString() : "I don't have an outstanding offer with " + user.toString());
 
 			return callback(null, found);
-		}
+		} else
+			console.log("No offers sent.");
 
 		callback(null, false);
 	});
@@ -162,7 +163,7 @@ exports.withdraw = (partner, callback) => {
 exports.createBuyOffer = (partner, price, payment, full, callback) => {
 	let removeFunc = (error) => {
 		if(error) {
-			steam.message("Failed to remove your reservation, please use !cancel if you want to buy more games, details might follow this message.");
+			steam.message(partner, "Failed to remove your reservation, please use !cancel if you want to buy more games, details might follow this message.");
 			return callback(error);
 		}
 	}
@@ -374,7 +375,7 @@ exports.createBuyOffer = (partner, price, payment, full, callback) => {
 exports.createRandomBuyOffer = (partner, price, payment, full, callback) => {
 	let removeFunc = (error) => {
 		if(error) {
-			steam.message("Failed to remove your reservation, please use !cancel if you want to buy more games, details might follow this message.");
+			steam.message(partner, "Failed to remove your reservation, please use !cancel if you want to buy more games, details might follow this message.");
 			return callback(error);
 		}
 	}

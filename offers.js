@@ -84,8 +84,17 @@ exports.hasOffer = (user, callback) => {
 		if(error)
 			return callback(error);
 
-		if(sent.length)
-			return callback(null, true);
+		if(sent.length) {
+			let found = false;
+			sent.forEach(offer => {
+				if(offer.partner.getSteamID64() == user.toString()) {
+					found = true;
+					return;
+				}
+			});
+
+			return callback(null, found);
+		}
 
 		callback(null, false);
 	});

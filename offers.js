@@ -93,11 +93,8 @@ exports.hasOffer = (user, callback) => {
 				}
 			});
 
-			console.log(found ? "I have an outstanding offer with " + user.toString() : "I don't have an outstanding offer with " + user.toString());
-
 			return callback(null, found);
-		} else
-			console.log("No offers sent.");
+		}
 
 		callback(null, false);
 	});

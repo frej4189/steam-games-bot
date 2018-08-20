@@ -14,6 +14,7 @@ const users = require('./users');
 const files = require('./files');
 
 var first = true;
+var ongoing = false;
 
 exports.setup = (client, cookies, callback) => {
 	manager = new TradeOfferManager({
@@ -59,15 +60,27 @@ const registerEvents = () => {
 		if(offer.state == 3) {
 			steam.message(offer.partner, "Offer accepted, handling..");
 
-			users.offerAccepted(offer.partner, error => {
-				if(error)
-					return steam.message(offer.partner, "Failed to mark your offer as accepted, please contact an admin about this.");
+			let mark = () => {
+				if(ongoing)
+					return setTimeout(mark, 1500);
 
-				users.handle(offer.partner, error => {
-					if(error)
-						steam.message(offer.partner, "Failed to retrieve the key for your game, please use !retrieve to get it.");
+				ongoing = true;
+
+				users.offerAccepted(offer.partner, error => {
+					if(error) {
+						ongoing = false;
+						return steam.message(offer.partner, "Failed to mark your offer as accepted, please contact an admin about this.");
+					}
+
+					ongoing = false;
+
+					users.handle(offer.partner, error => {
+						if(error)
+							steam.message(offer.partner, "Failed to retrieve the key for your game, please use !retrieve to get it.");
+					});
 				});
-			});
+			}
+			mark();
 		} else if(offer.state == 7) {
 			users.removeReservation(offer.partner, true, error => {
 				if(error)
@@ -79,11 +92,24 @@ const registerEvents = () => {
 	});
 }
 
-exports.checkForAccepted = (user, callback) => {
-	user = user.toString();
+exports.hasOffer = (user, callback) => {
+	manager.getOffers(1, (error, sent, received) => {
+		if(error)
+			return callback(error);
 
-	manager.getOffers(TradeOfferManager.EOfferFilter.HistoricalOnly, (error, sent, received) => {
+		if(sent.length) {
+			let found = false;
+			sent.forEach(offer => {
+				if(offer.partner.getSteamID64() == user.toString()) {
+					found = true;
+					return;
+				}
+			});
 
+			return callback(null, found);
+		}
+
+		callback(null, false);
 	});
 }
 
@@ -147,7 +173,7 @@ exports.withdraw = (partner, callback) => {
 exports.createBuyOffer = (partner, price, payment, full, callback) => {
 	let removeFunc = (error) => {
 		if(error) {
-			steam.message("Failed to remove your reservation, please use !cancel if you want to buy more games, details might follow this message.");
+			steam.message(partner, "Failed to remove your reservation, please use !cancel if you want to buy more games, details might follow this message.");
 			return callback(error);
 		}
 	}
@@ -359,7 +385,7 @@ exports.createBuyOffer = (partner, price, payment, full, callback) => {
 exports.createRandomBuyOffer = (partner, price, payment, full, callback) => {
 	let removeFunc = (error) => {
 		if(error) {
-			steam.message("Failed to remove your reservation, please use !cancel if you want to buy more games, details might follow this message.");
+			steam.message(partner, "Failed to remove your reservation, please use !cancel if you want to buy more games, details might follow this message.");
 			return callback(error);
 		}
 	}

@@ -5,8 +5,15 @@ const files = require('./files');
 const users = require('./users');
 
 let tasks = [];
+let current = [];
+
+exports.setWorking = (user) => {current.push(user)};
+exports.setNotWorking = (user) => {current.splice(current.indexOf(user), 1)}
 
 exports.execute = (sender, command, args) => {
+	if(current.indexOf(sender.getSteamID64()) > -1)
+		return steam.message(sender, "Please wait for your current action to be completed.");
+
 	let cmdObj = commands[command];
 
 	if(cmdObj == null)
@@ -107,7 +114,9 @@ const broadcast = (sender, args) => {
 }
 
 const withdraw = (sender) => {
+	let index = current.push(sender.getSteamID64()) - 1;
 	offers.withdraw(sender, (error, offer) => {
+		current.splice(index, 1);
 		if(error) {
 			if(typeof error != 'string') {
 				console.error(error);
@@ -187,7 +196,10 @@ const buy = (sender, args) => {
 	if(args.length >= 1)
 		amount = parseInt(args[0]);
 
+	let index = current.push(sender.getSteamID64()) - 1;
+
 	users.buyGame(sender.toString(), amount, "csgo", (error, offer) => {
+		current.splice(index, 1);
 		if(error) {
 			if(typeof error != 'string') {
 				console.error(error);
@@ -210,7 +222,10 @@ const buytf = (sender, args) => {
 	if(args.length >= 1)
 		amount = parseInt(args[0]);
 
+	let index = current.push(sender.getSteamID64()) - 1;
+
 	users.buyGame(sender.toString(), amount, "tf", (error, offer) => {
+		current.splice(index, 1);
 		if(error) {
 			if(typeof error != 'string') {
 				console.error(error);
@@ -233,7 +248,10 @@ const buygems = (sender, args) => {
 	if(args.length >= 1)
 		amount = parseInt(args[0]);
 
+	let index = current.push(sender.getSteamID64()) - 1;
+
 	users.buyGame(sender.toString(), amount, "gems", (error, offer) => {
+		current.splice(index, 1);
 		if(error) {
 			if(typeof error != 'string') {
 				console.error(error);
@@ -255,7 +273,10 @@ const buyrandom = (sender, args) => {
 	if(args.length >= 1)
 		amount = parseInt(args[0]);
 
+	let index = current.push(sender.getSteamID64()) - 1;
+
 	users.buyRandom(sender.toString(), amount, "csgo", (error, offer) => {
+		current.splice(index, 1);
 		if(error) {
 			if(typeof error != 'string') {
 				console.error(error);
@@ -277,7 +298,10 @@ const buyrandomtf = (sender, args) => {
 	if(args.length >= 1)
 		amount = parseInt(args[0]);
 
+	let index = current.push(sender.getSteamID64()) - 1;
+
 	users.buyRandom(sender.toString(), amount, "tf", (error, offer) => {
+		current.splice(index, 1);
 		if(error) {
 			if(typeof error != 'string') {
 				console.error(error);
@@ -299,7 +323,10 @@ const buyrandomgems = (sender, args) => {
 	if(args.length >= 1)
 		amount = parseInt(args[0]);
 
+	let index = current.push(sender.getSteamID64()) - 1;
+
 	users.buyRandom(sender.toString(), amount, "gems", (error, offer) => {
+		current.splice(index, 1);
 		if(error) {
 			if(typeof error != 'string') {
 				console.error(error);

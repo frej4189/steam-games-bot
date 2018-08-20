@@ -3,6 +3,10 @@ const games = require('./games');
 const offers = require('./offers');
 const fs = require('fs');
 const async = require('async');
+const commands = require('./commands');
+
+let currentRead = null;
+let currentData = null;
 
 exports.updatePersona = () => {
 	games.getRandomPrice((error, price, rgames) => {
@@ -96,62 +100,70 @@ exports.performBuyCheck = (user, callback) => {
 }
 
 exports.buyGame = (sender, amount, payment, callback) => {
-	if(amount <= 0)
-		return callback("Amount must be greater than 0");
-
-	let file = "data/games/unique.json";
-
-	let user = sender;
-
-	if(!fs.existsSync) {
-		games.createFile("unique", error => {
-			if(error)
-				return callback(error);
-
-			buyGame(sender, payment, callback);
-		});
-	}
-
-	let read = fs.createReadStream(file, 'utf8');
-	let data = "";
-
-	read.on('data', chunk =>
-		data += chunk
-	);
-
-	read.on('end', () => {
-		let json;
-
-		try {
-			json = JSON.parse(data);
-		} catch(error) {
+	offers.hasOffer(sender, (error, has) => {
+		if(error)
 			return callback(error);
-		}
 
-		games.getUnique((error, unique) => {
-			if(error)
-				return callback(error);
+		if(has)
+			return callback("Please react to my outstanding offer with you.");
 
-			offers.getOwnedGames(user, (error, owned) => {
+		if(amount <= 0)
+			return callback("Amount must be greater than 0");
+
+		let file = "data/games/unique.json";
+
+		let user = sender;
+
+		if(!fs.existsSync) {
+			games.createFile("unique", error => {
 				if(error)
 					return callback(error);
 
-				let diff = [];
-				let gamelist = unique.games;
+				buyGame(sender, payment, callback);
+			});
+		}
 
-				gamelist.forEach(game => {
-					if(owned.indexOf(game) < 0)
-						diff.push(game);
-				});
+		let read = fs.createReadStream(file, 'utf8');
+		let data = "";
 
-				if(diff.length <= 0)
-					return callback("I don't have any games that you don't already own.");
+		read.on('data', chunk =>
+			data += chunk
+		);
 
-				createReservation(sender, diff, amount, payment, json, (error, full) => {
+		read.on('end', () => {
+			let json;
+
+			try {
+				json = JSON.parse(data);
+			} catch(error) {
+				return callback(error);
+			}
+
+			games.getUnique((error, unique) => {
+				if(error)
+					return callback(error);
+
+				offers.getOwnedGames(user, (error, owned) => {
 					if(error)
 						return callback(error);
 
-					buyGame(sender, amount, payment, json, full, callback);
+					let diff = [];
+					let gamelist = unique.games;
+
+					gamelist.forEach(game => {
+						if(owned.indexOf(game) < 0)
+							diff.push(game);
+					});
+
+					if(diff.length <= 0)
+						return callback("I don't have any games that you don't already own.");
+
+					createReservation(sender, diff, amount, payment, json, (error, full) => {
+						if(error)
+							return callback(error);
+
+						buyGame(sender, amount, payment, json, full, callback);
+					});
 				});
 			});
 		});
@@ -159,30 +171,38 @@ exports.buyGame = (sender, amount, payment, callback) => {
 }
 
 exports.buyRandom = (sender, amount, payment, callback) => {
-	if(amount <= 0)
-		return callback("Amount must be greater than 0");
-
-	let read = fs.createReadStream("data/games/random.json", 'utf8');
-	let data = "";
-
-	read.on('data', chunk =>
-		data += chunk
-	);
-
-	read.on('end', () => {
-		let json;
-
-		try {
-			json = JSON.parse(data);
-		} catch(error) {
+	offers.hasOffer(sender, (error, has) => {
+		if(error)
 			return callback(error);
-		}
 
-		createRandomReservation(sender, amount, payment, json, (error, full) => {
-			if(error)
+		if(has)
+			return callback("Please react to my outstanding offer with you.");
+
+		if(amount <= 0)
+			return callback("Amount must be greater than 0");
+
+		let read = fs.createReadStream("data/games/random.json", 'utf8');
+		let data = "";
+
+		read.on('data', chunk =>
+			data += chunk
+		);
+
+		read.on('end', () => {
+			let json;
+
+			try {
+				json = JSON.parse(data);
+			} catch(error) {
 				return callback(error);
+			}
 
-			buyRandomGame(sender, amount, payment, json, full, callback);
+			createRandomReservation(sender, amount, payment, json, (error, full) => {
+				if(error)
+					return callback(error);
+
+				buyRandomGame(sender, amount, payment, json, full, callback);
+			});
 		});
 	});
 }
@@ -223,14 +243,20 @@ const createRandomReservation = (user, amount, payment, gameObj, callback) => {
 		full = false;
 	}
 
-	let read = fs.createReadStream('data/reservations.json', 'utf8');
-	let data = "";
+	let read = currentRead == null ? fs.createReadStream('data/reservations.json', 'utf8') : currentRead;
+	let data = currentData == null ? "" : currentData;
 
-	read.on('data', chunk =>
-		data += chunk
-	);
+	currentRead = read;
+	currentData = data;
+
+	read.on('data', chunk => {
+		data += chunk;
+		currentData = data;
+	});
 
 	read.on('end', () => {
+		currentRead = null;
+		currentData = null;
 		let json;
 
 		try {
@@ -309,14 +335,20 @@ const createReservation = (user, diff, amount, payment, gameObj, callback) => {
 	} else if(translated.length < gamelist && amount > 1)
 		return callback("I don't have enough keys in stock for you to buy " + gamelist + " games, please try a lower amount.");
 
-	let read = fs.createReadStream('data/reservations.json', 'utf8');
-	let data = "";
+	let read = currentRead == null ? fs.createReadStream('data/reservations.json', 'utf8') : currentRead;
+	let data = currentData == null ? "" : currentData;
 
-	read.on('data', chunk =>
-		data += chunk
-	);
+	currentRead = read;
+	currentData = data;
+
+	read.on('data', chunk => {
+		data += chunk;
+		currentData = data;
+	});
 
 	read.on('end', () => {
+		currentRead = null;
+		currentData = null;
 		let json;
 
 		try {
@@ -370,17 +402,31 @@ const createReservation = (user, diff, amount, payment, gameObj, callback) => {
 	});
 }
 
-exports.removeReservation = (user, add, callback) => {
+exports.removeReservation = (user, add, cb) => {
 	user = user.toString();
+	if(add)
+		commands.setWorking(user);
 
-	let read = fs.createReadStream('data/reservations.json', 'utf8');
-	let data = "";
+	let callback = (error) => {
+		cb(error);
+		if(add)
+			commands.setNotWorking(user);
+	}
 
-	read.on('data', chunk =>
-		data += chunk
-	);
+	let read = currentRead == null ? fs.createReadStream('data/reservations.json', 'utf8') : currentRead;
+	let data = currentData == null ? "" : currentData;
+
+	currentRead = read;
+	currentData = data;
+
+	read.on('data', chunk => {
+		data += chunk;
+		currentData = data;
+	});
 
 	read.on('end', () => {
+		currentRead = null;
+		currentData = null;
 		let json;
 
 		try {
@@ -459,14 +505,20 @@ exports.removeReservation = (user, add, callback) => {
 exports.offerAccepted = (user, callback) => {
 	user = user.toString();
 
-	let read = fs.createReadStream('data/reservations.json', 'utf8');
-	let data = "";
+	let read = currentRead == null ? fs.createReadStream('data/reservations.json', 'utf8') : currentRead;
+	let data = currentData == null ? "" : currentData;
 
-	read.on('data', chunk =>
-		data += chunk
-	);
+	currentRead = read;
+	currentData = data;
+
+	read.on('data', chunk => {
+		data += chunk;
+		currentData = data;
+	});
 
 	read.on('end', () => {
+		currentRead = null;
+		currentData = null;
 		let json;
 
 		try {
@@ -497,14 +549,20 @@ exports.offerAccepted = (user, callback) => {
 exports.handle = (user, callback) => {
 	user = user.toString();
 
-	let read = fs.createReadStream('data/reservations.json', 'utf8');
-	let data = "";
+	let read = currentRead == null ? fs.createReadStream('data/reservations.json', 'utf8') : currentRead;
+	let data = currentData == null ? "" : currentData;
 
-	read.on('data', chunk =>
-		data += chunk
-	);
+	currentRead = read;
+	currentData = data;
+
+	read.on('data', chunk => {
+		data += chunk;
+		currentData = data;
+	});
 
 	read.on('end', () => {
+		currentRead = null;
+		currentData = null;
 		let json;
 
 		try {
@@ -517,21 +575,7 @@ exports.handle = (user, callback) => {
 			return callback("You have not bought game yet, use !buy or !buyrandom");
 
 		if(!json[user].accepted) {
-			offers.checkForAccepted(user, (error, accepted) => {
-				if(error)
-					return callback(error);
-
-				if(!accepted)
-					return callback("You must first accept your outstanding offer");
-
-				exports.offerAccepted(user, (error) => {
-					if(error)
-						return callback(error)
-
-					exports.handle(user, callback);	
-				});
-			});
-			return;
+			return callback("You must first accept your outstanding offer");
 		}
 
 		let keys = json[user].keys;

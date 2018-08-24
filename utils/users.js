@@ -11,11 +11,11 @@ let currentData = null;
 exports.updatePersona = () => {
 	games.getRandomPrice((error, price, rgames) => {
 		if(error)
-			return;
+			return console.error("Error while updating status: " + error);
 
 		games.getUniqueCount((error, games) => {
 			if(error)
-				return;
+				return console.error("Error while updating status: " + error);
 
 			let csgo = "0:1";
 			if(price.csgo.price && price.csgo.games)

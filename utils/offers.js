@@ -19,7 +19,8 @@ var ongoing = false;
 exports.setup = (client, cookies, callback) => {
 	manager = new TradeOfferManager({
 		steam: client,
-		domain: "example.net"
+		domain: "example.net",
+		community: community
 	});
 	community = new SteamCommunity();
 

@@ -19,8 +19,7 @@ var ongoing = false;
 exports.setup = (client, cookies, callback) => {
 	manager = new TradeOfferManager({
 		steam: client,
-		domain: "example.net",
-		community: community
+		domain: "example.net"
 	});
 	community = new SteamCommunity();
 
@@ -602,7 +601,9 @@ exports.cancel = (user, callback) => {
 				offer.cancel();
 		});
 
-		callback();
+		users.removeReservation(user, true, error => {
+			callback(error);
+		});
 	});
 }
 

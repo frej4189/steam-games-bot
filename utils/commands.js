@@ -168,10 +168,6 @@ const check = (sender, args) => {
 	});
 }
 
-const owner = (sender) => {
-	steam.message(sender, files.getConfig().owner);
-}
-
 const price = (sender) => {
 	games.getPrice((error, random, unique) => {
 		if(error) {
@@ -396,11 +392,6 @@ const commands = {
 		description: 'Displays a list of available commands.',
 		admin: false,
 		exec: help
-	},
-	owner: {
-		description: 'Tells you who owns this bot.',
-		admin: false,
-		exec: owner
 	},
 	price: {
 		description: 'Displays my prices.',
